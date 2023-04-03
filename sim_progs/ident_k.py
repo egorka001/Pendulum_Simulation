@@ -5,14 +5,14 @@ import copy
 import math
 import json
 
-with open("../sim_logs/theta_logs_1.txt", 'r') as file:
+with open("../sim_logs/theta_night.txt", 'r') as file:
     data = json.load(file)
 
-data = data[10:]
+data = data[100:]
 begin_theta = 0
 while (data[begin_theta][0] <= data[begin_theta + 3][0]):
     begin_theta += 1
-data = data[begin_theta:-300]
+data = data[begin_theta:]
 
 null_time = data[0][1]
 for i in range(len(data)):
@@ -74,7 +74,7 @@ time_theor = list(range(int(time_real[-1] / time_k)))
 
 q0 = data[0][0]
 t0 = data[0][1]
-k = [0, 0, 10**(-6)]
+k = [1, 1, 10**(-4)]
 
 real_dct = {}
 for i in range(len(theta_real)):
@@ -97,6 +97,7 @@ linf = l_norms(k, time_theor, real_out, temp, 0)
 print("k: ", k)
 print("l_2: ", l2)
 print("l_inf: ", linf)
+print("q0", q0)
 
 theta_theor = symp_euler(rp, [q0, t0], time_theor, k)
 theta_theor = theta_theor[:,0]
@@ -112,22 +113,25 @@ for i in range(len(theta_real)):
 for i in range(len(theta_theor)):
     to_out["theor"].append([theta_theor[i], time_theor_graph[i]])
 
-with open('../graph_logs/real_theor_base_data.txt', 'w') as file:
-    json.dump(to_out, file)
+#with open('../graph_logs/real_theor_base_data.txt', 'w') as file:
+#    json.dump(to_out, file)
 
-plt.plot(time_real, theta_real, label = "Реальный маятник", color='black',
+plt.plot(time_real, theta_real, label = "Реальный маятник", color='blue',
         linewidth=2)
 plt.plot(time_theor_graph, theta_theor, label = "Теоретический маятник",
-         color = 'gray', linewidth=2)
+         color = 'orange', linewidth=2)
 #plt.title("Угол отклонения реального маятника и теоретического")
 plt.xlabel("Время, с", fontsize=22)
 plt.ylabel("Отклонение, рад", fontsize=22)
-plt.yticks(ticks=[-math.pi/6, -math.pi/12, 0, math.pi/12, math.pi/6],
-           labels=["$-\\frac{\pi}{6}$", "$-\\frac{\pi}{12}$",  "0", 
-                   "$\\frac{\pi}{12}$", "$\\frac{\pi}{6}$"],
+plt.yticks(ticks=[-math.pi/4, -math.pi/6, -math.pi/12, 0, 
+                  math.pi/12, math.pi/6, math.pi/4],
+           labels=["$-\\frac{\pi}{4}$", "$-\\frac{\pi}{6}$", 
+                  "$-\\frac{\pi}{12}$",  "0", 
+                   "$\\frac{\pi}{12}$", "$\\frac{\pi}{6}$", 
+                   "$\\frac{\pi}{4}$"],
            fontsize=22)
-plt.xticks(ticks=np.arange(0, 3*10**7, 10**6),
-           labels=np.arange(0, 30, 1), fontsize=22)
+plt.xticks(ticks=np.arange(0, 6*10**7, 10**6),
+           labels=np.arange(0, 60, 1), fontsize=22)
 plt.grid(True)
 plt.legend(fontsize=22)
 plt.show()
